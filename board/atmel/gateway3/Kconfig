@@ -1,0 +1,12 @@
+if TARGET_GATEWAY3
+
+config SYS_BOARD
+	default "gateway3"
+
+config SYS_VENDOR
+	default "atmel"
+
+config SYS_CONFIG_NAME
+	default "gateway3"
+
+endif

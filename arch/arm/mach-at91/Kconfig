@@ -118,6 +118,13 @@ config TARGET_SAMA5D3XEK
 	select SUPPORT_SPL
 	select BOARD_EARLY_INIT_F
 
+config TARGET_GATEWAY3
+	bool "Gateway3 board"
+	select BOARD_LATE_INIT
+	select CPU_V7
+	select SUPPORT_SPL
+	select BOARD_EARLY_INIT_F
+
 config TARGET_SAMA5D4_XPLAINED
 	bool "SAMA5D4 Xplained board"
 	select CPU_V7
@@ -193,6 +200,7 @@ source "board/atmel/sama5d3_xplained/Kconfig"
 source "board/atmel/sama5d3xek/Kconfig"
 source "board/atmel/sama5d4_xplained/Kconfig"
 source "board/atmel/sama5d4ek/Kconfig"
+source "board/atmel/gateway3/Kconfig"
 source "board/bluewater/gurnard/Kconfig"
 source "board/bluewater/snapper9260/Kconfig"
 source "board/calao/usb_a9263/Kconfig"
