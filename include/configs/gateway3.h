@@ -98,10 +98,10 @@
 #define CONFIG_BOOTCOMMAND    "mtdparts default; "                            \
                               "ubi part rootfs; "                             \
                               "ubifsmount ubi0:rootfs; "                      \
-                              "ubifsload 0x21000000 /boot/gateway3.dtb; "     \
+                              "ubifsload 0x21000000 /boot/gateway3_1.dtb; "     \
                               "ubifsload 0x22000000 /boot/zImage; "           \
                               "bootz 0x22000000 - 0x21000000; "               \
-                              "ubifsload 0x21000000 /boot/gateway3-old.dtb; " \
+                              "ubifsload 0x21000000 /boot/gateway3_1-old.dtb; " \
                               "ubifsload 0x22000000 /boot/zImage-old; "       \
                               "bootz 0x22000000 - 0x21000000; "               \
                               "reset"
