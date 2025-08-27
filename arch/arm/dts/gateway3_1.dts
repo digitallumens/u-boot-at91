@@ -1,0 +1,212 @@
+/*
+ * gateway3.dts - Device Tree file for DL Gateway3 board
+ *
+ *  Copyright (C) 2014 Digital Lumens,
+ *                2014 Chris Elledge <celledge@digitallumens.com>
+ *
+ * Licensed under GPLv2 or later.
+ */
+/dts-v1/;
+#include "sama5d3.dtsi"
+#include "sama5d3xcm.dtsi"
+#include "sama5d3_emac.dtsi"
+
+/ {
+	model = "siteworx,gateway3-1";
+	compatible = "siteworx,gateway3-1", "digitallumens,gateway3", "atmel,sama5d3xmb", "atmel,sama5d3xcm", "atmel,sama5d31", "atmel,sama5d3", "atmel,sama5";
+
+	aliases {
+		spi0 = &spi0;
+	};
+
+	ahb {
+		apb {
+			spi0: spi@f0004000 {
+				status = "okay";
+				spi_flash@0 {
+					compatible = "jedec,spi-nor";
+					spi-max-frequency = <50000000>;
+					reg = <0>;
+					bootph-all;
+				};
+			};
+
+			ssc0: ssc@f0008000 {
+				atmel,clk-from-rk-pin;
+				status = "okay";
+			};
+
+			i2c0: i2c@f0014000 {
+				status = "okay";
+				atecc_0: certificate-gateway@60 {
+					compatible = "atmel,atecc108";
+					reg = <0x60>;
+				};
+			};
+
+			i2c2: i2c@f801c000 {
+				status = "okay";
+				lm75: lm75@48 {
+					compatible = "nxp,lm75a";
+					reg = <0x48>;
+				};
+			};
+
+			usart1: serial@f0020000 {
+				pinctrl-names = "default";
+				rts-gpios = <&pioB 27 GPIO_ACTIVE_LOW>;
+				cts-gpios = <&pioB 26 GPIO_ACTIVE_LOW>;
+				status = "okay";
+			};
+
+			mmc1: mmc@f8000000 {
+				pinctrl-names = "default";
+				pinctrl-0 = <&pinctrl_mmc1_clk_cmd_dat0 &pinctrl_mmc1_dat1_3 &pinctrl_mmc1_cd>;
+				status = "okay";
+				slot@0 {
+					reg = <0>;
+					bus-width = <4>;
+					cd-gpios = <&pioD 18 GPIO_ACTIVE_HIGH>;
+				};
+			};
+
+			macb1: ethernet@f802c000 {
+				phy-mode = "rmii";
+				status = "okay";
+
+				#address-cells = <1>;
+				#size-cells = <0>;
+				phy0: ethernet-phy@1 {
+					interrupt-parent = <&pioE>;
+					interrupts = <30 IRQ_TYPE_EDGE_FALLING>;
+					reg = <1>;
+				};
+			};
+			
+			pwm0: pwm@f002c000 {
+			      pinctrl-names = "default";
+			      pinctrl-0 = <&pinctrl_pwm0_pwmh0_0 &pinctrl_pwm0_pwmh1_0 &pinctrl_pwm0_pwmh2_1>;
+			      status = "okay";
+			};
+
+			pinctrl@fffff200 {
+				board {
+					pinctrl_mmc1_cd: mmc1_cd {
+						atmel,pins =
+							<AT91_PIOD 18 AT91_PERIPH_GPIO AT91_PINCTRL_PULL_UP_DEGLITCH>; /* PD18 GPIO with pullup deglitch */
+					};
+
+					pinctrl_usba_vbus: usba_vbus {
+						atmel,pins =
+							<AT91_PIOD 29 AT91_PERIPH_GPIO AT91_PINCTRL_DEGLITCH>; /* PD29 GPIO with deglitch */
+					};
+				};
+			};
+
+			dbgu: serial@ffffee00 {
+				status = "okay";
+			};
+
+			watchdog@fffffe40 {
+				status = "okay";
+			};
+		};
+
+		ebi@10000000 {
+			nand_controller: nand-controller {
+				nand@3 {
+					nand-ecc-strength = <8>;
+				};
+			};
+		};
+
+		usb0: gadget@00500000 {
+			atmel,vbus-gpio = <&pioD 29 GPIO_ACTIVE_HIGH>;
+			pinctrl-names = "default";
+			pinctrl-0 = <&pinctrl_usba_vbus>;
+			status = "okay";
+		};
+
+		usb1: ohci@00600000 {
+			num-ports = <3>;
+			atmel,vbus-gpio = <0
+					   &pioD 26 GPIO_ACTIVE_HIGH
+					   0
+					  >;
+			atmel,oc-gpio = <0
+					 &pioD 28 0
+					 0
+					>;
+			status = "okay";
+		};
+
+		usb2: ehci@00700000 {
+			status = "okay";
+		};
+	};
+
+	leds {
+	     compatible = "gpio-leds";
+	     l1red {
+	     	gpios = <&pioA 0 GPIO_ACTIVE_HIGH>;
+		linux,default-trigger = "timer";
+		linux,default-delay_on = "500";
+		linux,default-delay_off = "500";
+	     };
+	     l1blue {
+	     	gpios = <&pioA 1 GPIO_ACTIVE_HIGH>;
+		default-state = "off";
+	     };
+	     l2green {
+	     	gpios = <&pioA 2 GPIO_ACTIVE_HIGH>;
+		default-state = "off";
+	     };
+	     l2yellow {
+	     	gpios = <&pioA 3 GPIO_ACTIVE_HIGH>;
+		default-state = "off";
+	     };
+	     l3red {
+	     	gpios = <&pioA 4 GPIO_ACTIVE_HIGH>;
+		default-state = "off";
+	     };
+	     l3blue {
+	     	gpios = <&pioA 5 GPIO_ACTIVE_HIGH>;
+		default-state = "off";
+	     };
+	     emreset {
+	     	label = "em_reset";
+		gpios = <&pioD 0 GPIO_ACTIVE_LOW>;
+		linux,default-trigger = "oneshot";
+		linux,default-delay_on = "20";
+		linux,default-delay_off = "100";
+	     };
+	};
+	pwmleds {
+	     compatible = "pwm-leds";
+	     red {
+	     	label = "red";
+		pwms = <&pwm0 0 5000 0>;
+		max-brightness = <255>;
+		linux,default-trigger = "default-on";
+	     };
+	     green {
+	     	label = "green";
+		pwms = <&pwm0 1 5000 0>;
+		max-brightness = <255>;
+	     };
+	     blue {
+	     	label = "blue";
+		pwms = <&pwm0 2 5000 0>;
+		max-brightness = <255>;
+	     };
+	     fake {
+	        /*Fake LED that is always on to prevent linux from
+		  disabling the PWM when RGB are all off.*/
+                label = "fake";
+		max-brightness = <255>;
+		pwms = <&pwm0 3 5000 0>;
+		linux,default-trigger = "default-on";
+	     };
+	};
+
+};
